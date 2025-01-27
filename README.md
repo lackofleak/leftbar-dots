@@ -84,6 +84,13 @@ nano ~/.config/hypr/hyprpaper.conf
         exec uwsm start hyprland-uwsm.desktop
     fi
     ```
+- don't forget to download and setup gtk theme, icon theme and cursor
+```
+gtk theme name = Rosepine-Dark-Moon
+gtk icon theme name = Reversal-purple-dark
+gtk cursor theme name = Bibata-Modern-Ice
+```
+- and a NerdFont ! I recommend `JetBrainsMono` Nerd Font.
 - if you have problem using dotfiles, open an issue
 
 > [!NOTE]
