@@ -17,7 +17,7 @@
     (button
         :class "button launcher"
         :onclick "wofi &"
-        (image :class "icon" :path "/home/amir/.config/eww/images/nix-snowflake.svg" :image-width 30)
+        (image :class "icon" :path "~/.config/eww/images/nix-snowflake.svg" :image-width 30)
     )
   )
 )
