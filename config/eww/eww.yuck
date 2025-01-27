@@ -1,0 +1,326 @@
+(defwindow bar
+  :monitor 0
+  :exclusive true
+  :stacking "fg"
+  :focusable false
+  :geometry (geometry :width "2.5%"
+                      :height "98%"
+                      :x "10px"
+                      :anchor "center left"
+            )
+          (barwidgets)
+)
+
+
+(defwidget launcher []
+  (eventbox :class "launcher" :cursor "pointer" 
+    (button
+        :class "button launcher"
+        :onclick "wofi &"
+        (image :class "icon" :path "/home/amir/.config/eww/images/nix-snowflake.svg" :image-width 30)
+    )
+  )
+)
+
+
+(deflisten workspaces :initial "[]" "bash ~/.config/eww/scripts/get-workspaces")
+(deflisten current_workspace :initial "1" "bash ~/.config/eww/scripts/get-active-workspace")
+(defwidget workspaces []
+  (eventbox 
+    :onscroll "bash ~/.config/eww/scripts/change-active-workspace {} ${current_workspace}" 
+    :class "workspaces-widget" 
+    :cursor "pointwindow_wer"
+    (box 
+      :space-evenly false 
+      :orientation "v"
+      (label 
+        :text "${workspaces}${current_workspace}" 
+        :visible false
+      )
+      (for workspace in workspaces
+        (eventbox 
+          :onclick "hyprctl dispatch workspace ${workspace.id}"
+          (box 
+            :class "workspace-entry ${workspace.id == current_workspace ? "current" : ""} ${workspace.windows > 0 ? "occupied" : "empty"}"
+            :spacing 2
+            (label :text "${workspace.id == current_workspace ? "" : "${workspace.windows > 0 ? "" : ""}"} ")
+          )
+        )
+      )
+    )
+  )
+)
+
+
+(defwidget tray []
+  (box :orientation "v" :class "tray"
+    (systray :orientation "v" :prepend-new true)
+  )
+)
+
+
+(defpoll    hour        :interval "5s" `date "+%H"`)
+(defpoll    minutes     :interval "5s" `date "+%M"`)
+(defwidget clock []
+  (box
+    :space-evenly false
+    :spacing -8
+    :orientation "v"
+    (label :text hour :class "hour")
+    (label :text "󰇘" :class "sep")
+    (label :text minutes :class "min")
+  )
+)
+
+
+(defvar powermenu_reveal false)
+(defwidget powermenu []
+  (eventbox 
+    :onhover "eww update powermenu_reveal=true"
+    :onhoverlost "eww update powermenu_reveal=false"
+    :cursor "pointer"
+    (box
+      :orientation "v"
+      :space-evenly "false"
+      :vexpand "false"
+      :class "powermenu"
+      :spacing 8
+      (revealer
+        :transition "slideup"
+        :reveal powermenu_reveal
+        :duration "550ms"
+        (box
+          :orientation "v"
+          :space-evenly "false"
+          :spacing 8
+          (button
+            :class "button-quit"
+            :onclick "hyprctl dispatch exit" 
+            "󰗽"
+          )
+          (button
+            :class "button-sus"
+            :onclick "hyprlock & systemctl suspend -i"
+            "󰍷"
+          )
+          (button
+            :class "button-lock" 				
+            :onclick "hyprlock &"	
+            "󰌾"
+          )
+          (button
+            :class "button-reb"					
+            :onclick "reboot"	
+            ""
+          )
+        )
+      )
+      (button		
+        :class "button-off"
+        :onclick "shutdown -h now"	
+        "⏻"
+      )
+    )
+  )
+)
+
+
+(defvar layout "US")
+(defwidget kb []
+  (eventbox :onclick "bash ~/.config/eww/scripts/kb" :cursor "pointer"
+    (label
+      :text "${layout == "US" ? "us" : "fa"}"
+      :class "${layout == "US" ? "us" : "fa"}"
+      :tooltip layout
+    )
+  )
+)
+
+
+(defvar brightness 90)
+(defvar bright-reveal false)
+(defwidget bright []
+  (eventbox 
+    :onhover "eww update bright-reveal=true"
+    :onhoverlost "eww update bright-reveal=false"
+    :cursor "pointer"
+    (box
+      :orientation "v"  
+      :space-evenly "false"
+      (revealer 
+        :transition "slideup"
+        :reveal bright-reveal
+        :duration "550ms"
+        (scale
+          :class "bribar"
+          :value brightness
+          :tooltip "Brightness: ${brightness}%" 
+          :onchange "bash ~/.config/eww/scripts/brightness set {}%"
+          :orientation "v" 
+          :flipped true
+          :max 100
+          :min 0
+        )
+      )
+      (label
+        :class "bright-icon"
+        :text "󰃠"
+      )
+    )
+  )
+)
+
+
+(defvar vol-icon "")
+(defvar vol-stat "unmute")
+(defvar volume 1)
+(defvar vol-reveal false)
+(defwidget volume []
+  (eventbox
+    :onhover "eww update vol-reveal=true"
+    :onhoverlost "eww update vol-reveal=false"
+    :cursor "pointer"
+    :onclick "bash ~/.config/eww/scripts/volume XF86 mute"
+    (box
+      :orientation "v"  
+      :space-evenly "false"
+      (revealer 
+        :transition "slideup"
+        :reveal vol-reveal
+        :duration "550ms"
+        (scale
+          :class "volbar"
+          :value {volume*100}
+          :tooltip "volume: ${volume}" 
+          :onchange "bash ~/.config/eww/scripts/volume set {}%"
+          :orientation "v"
+          :flipped true
+          :max 150
+          :min 0
+        )
+      )
+      (label
+        :class "vol-icon"
+        :text vol-icon
+      )
+    )
+  )
+)
+
+
+(defpoll net-stat :interval "5s" "bash ~/.config/eww/scripts/network")
+(defwidget network []
+  (box
+    :orientation "v"
+    :class "network"
+    (eventbox :onclick "kitty -e nmtui &" :cursor "pointer" "${net-stat}")
+  )
+)
+
+
+(defvar bat-reveal false)
+(defwidget battery []
+  (eventbox
+    :onhover "eww update bat-reveal=true"
+    :onhoverlost "eww update bat-reveal=false"
+    (box
+      :class "bat-widget"
+      :orientation "v"
+      :space-evenly "false"
+      :spacing 5
+      (revealer 
+        :transition "slideup"
+        :reveal bat-reveal
+        :duration "550ms"
+        (label 
+          :angle 90
+          :text "${EWW_BATTERY.BAT1.capacity} %  "
+          :class "bat-label"
+        )
+      )
+      (overlay 
+        :class "${'${EWW_BATTERY.BAT1.status}' == 'Charging' ? "Charging" : '${EWW_BATTERY.BAT1.capacity}' < 30 ? "Low" : "Discharging" }"
+        (circular-progress
+          :value "${EWW_BATTERY.BAT1.capacity}"
+          :height 25
+          :thickness 2
+          :start-at 0
+
+        )
+        (label
+          :text "${'${EWW_BATTERY.BAT1.status}' == 'Charging' ? "" : ""}"
+          :class "stat-bat"
+        )
+      )
+    )
+  )
+)
+
+
+(defwidget top []
+  (box	
+    :orientation "v"
+    :space-evenly "false" 
+    :spacing 2
+    :valign "start" 
+    (launcher)
+    (workspaces)
+  )
+)
+(defwidget control []
+  (box
+    :class "control-widgets"
+    :orientation "v"
+    :space-evenly "false" 
+    :spacing 6
+    :valign "end"
+    (battery)
+    (network)
+    (volume)
+    (bright)
+  )
+)
+(defwidget bottom []
+  (box
+    :orientation "v"
+    :space-evenly "false" 
+    :spacing 2
+    :valign "end"
+    (tray)
+    (control)
+    (kb)
+    (clock)
+    (powermenu)
+  )
+)
+(defwidget barwidgets []
+  (box :orientation "v"
+  (top)
+  (bottom)
+  )
+)
+
+
+
+
+(defwindow screenshot
+  :monitor 0
+  :exclusive false
+  :stacking "overlay"
+  :focusable false
+  :geometry (geometry :width "200px"
+                      :height "47px"
+                      :y "10px"
+                      :anchor "center top"
+            )
+  (screenshot)
+)
+(defwidget screenshot []
+  (box
+    :orientation "h"
+    (eventbox :cursor "pointer" :onclick "eww close screenshot && hyprshot -m output" :tooltip "fullscreen" "")
+    (eventbox :cursor "pointer" :onclick "eww close screenshot && hyprshot -m window" :tooltip "window" "")
+    (eventbox :cursor "pointer" :onclick "eww close screenshot && hyprshot -m region" :tooltip "region" "󰒉")
+    (eventbox :cursor "pointer" :onclick "eww close screenshot" :tooltip "exit" "󰿅")
+  )
+)

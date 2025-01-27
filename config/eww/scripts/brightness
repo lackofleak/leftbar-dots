@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+brightness=$(brightnessctl -m -d amdgpu_bl1 | awk -F, '{print substr($4, 0, length($4)-1)}' | tr -d '%')
+if [[ $1 == "" ]]
+then 
+ echo $brightness
+fi
+
+if [[ $1 == 'XF86' ]] && [[ $2 == 'up'   ]]
+then 
+    brightnessctl set 5%+ -q
+    eww update brightness=$(brightnessctl -m -d amdgpu_bl1 | awk -F, '{print substr($4, 0, length($4)-1)}' | tr -d '%')
+    eww update bright-reveal=true
+    sleep 2
+    eww update bright-reveal=false
+fi
+
+if [[ $1 == 'XF86' ]] && [[ $2 == 'down'   ]]
+then 
+    brightnessctl set 5%- -q
+    eww update brightness=$(brightnessctl -m -d amdgpu_bl1 | awk -F, '{print substr($4, 0, length($4)-1)}' | tr -d '%')
+    eww update bright-reveal=true
+    sleep 2
+    eww update bright-reveal=false
+fi
+
+if [[ $1 == "set" ]]
+then 
+    brightnessctl set $2"%" -q
+    eww update brightness=$(brightnessctl -m -d amdgpu_bl1 | awk -F, '{print substr($4, 0, length($4)-1)}' | tr -d '%')
+
+fi

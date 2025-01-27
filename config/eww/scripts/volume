@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+volume=$(wpctl get-volume @DEFAULT_SINK@ | awk '{print $2}' |tr [MUTED] " ")
+stat=$(wpctl get-volume @DEFAULT_SINK@ | awk '{print $3}')
+
+
+if [[ $1 == "" ]]
+then 
+ echo $volume
+fi
+
+if [[ $1 == 'XF86' ]] && [[ $2 == 'up'   ]]
+then 
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+    eww update volume=$(wpctl get-volume @DEFAULT_SINK@ | awk '{print $2}' |tr [MUTED] " ")
+    eww update vol-reveal=true
+    sleep 2
+    eww update vol-reveal=false
+fi
+
+if [[ $1 == 'XF86' ]] && [[ $2 == 'down'   ]]
+then 
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+    eww update volume=$(wpctl get-volume @DEFAULT_SINK@ | awk '{print $2}' |tr [MUTED] " ")
+    eww update vol-reveal=true
+    sleep 2
+    eww update vol-reveal=false
+fi
+
+if [[ $1 == 'XF86' ]] && [[ $2 == 'mute'   ]]
+then 
+    wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+    eww update vol-icon=$(if [[ $(wpctl get-volume @DEFAULT_SINK@ | awk '{print $3}') == '[MUTED]' ]]; then echo  ; else echo   ; fi)
+fi
+
+if [[ $1 == "set" ]]
+then 
+    wpctl set-volume @DEFAULT_SINK@ $2
+    eww update volume=$(wpctl get-volume @DEFAULT_SINK@ | awk '{print $2}' |tr [MUTED] " ")
+fi
+
+if [[ $1 == "stat" ]]
+then 
+    if [[ $stat == "" ]]
+    then 
+        echo "unmute"
+    else
+        echo "mute"
+    fi
+fi

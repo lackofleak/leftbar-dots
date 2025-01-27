@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+hyprctl switchxkblayout at-translated-set-2-keyboard next
+layout=$(hyprctl devices -j | jq -r '.keyboards[] | select(.main == true) | .active_keymap' | sed 's/.*(\(.*\))/\1/')
+eww update layout=$layout

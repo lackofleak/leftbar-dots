@@ -1,0 +1,53 @@
+[global]
+monitor = 0
+follow = mouse
+notification_limit = 5
+indicate_hidden = true
+# main notif settings
+width = 300
+height = 75
+origin = top-center
+offset = 8x8
+frame_width = 3
+corner_radius = 8 
+gap_size = 2
+font = JetBrainsMono 10
+format = "<b>%s</b>\n%b"
+alignment = center
+dmenu = "wofi -d -p dunst"
+browser = "google-chrome"
+mouse_left_click = do_action, close_current
+mouse_right_click = context, close_current
+mouse_middle_click = close_all
+# progress bar settings
+progress_bar = true
+progress_bar_horizontal_alignment = center
+progress_bar_height = 10
+progress_bar_min_width = 10
+progress_bar_max_width = 300
+progress_bar_frame_width = 1
+progress_bar_corner_radius = 20
+progress_bar_corners = all
+# notif icons/pictures settings
+icon_corner_radius = 8
+text_icon_padding = 5
+max_icon_size = 100
+icon_corners = all
+icon_theme = Reversal-purple-dark
+# color
+frame_color = "#c6a0f6"
+separator_color= frame
+highlight = "#8aadf4"
+
+[urgency_low]
+background = "#24273a"
+foreground = "#cad3f5"
+
+[urgency_normal]
+background = "#24273a"
+foreground = "#cad3f5"
+
+[urgency_critical]
+background = "#24273a"
+foreground = "#cad3f5"
+frame_color = "#f5a97f"

@@ -1,0 +1,16 @@
+## Geometry
+mode=drun
+width=30%
+height=30%
+location=left  # Changed from 'left' to 'bottom' for south position
+
+## Images
+allow_markup=true
+allow_images=true
+image_size=34
+
+# Other
+show_all=false
+term=kitty
+#hide_scroll=true
+
